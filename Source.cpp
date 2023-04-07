@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <filesystem>
+#include <ostream>
+#include <ctime>
 using namespace std;
 
 vector <string> arr;
@@ -20,14 +23,14 @@ void printVector(){
     }
 }
 void inputString(string str){
-    string delimiter = " ";
+    string delim = " ";
     int start = 0;
-    int end = str.find(delimiter);
+    int end = str.find(delim);
     while (end != -1) {
         string test = str.substr(start, end - start);
 
-        start = end + delimiter.size();
-        end = str.find(delimiter, start);
+        start = end + delim.size();
+        end = str.find(delim, start);
         if (test.empty()){
             continue;
         }
@@ -35,90 +38,67 @@ void inputString(string str){
     }
     arr.push_back(str.substr(start, end - start));
 }
+void determineType(string str){
+    //current tester
+    filesystem::path path = "test.txt";
 
+    filesystem::file_status status = filesystem::status(path);
+    filesystem::file_type type = status.type();
+
+    switch(type){
+        case filesystem::file_type::regular:
+            cout << "reg\n";
+            break;
+        case filesystem::file_type::none:
+            cout << "none\n";
+            break;
+        case filesystem::file_type::not_found:
+            cout << "not found\n";
+            break;
+    }
+}
 int main() {
 
     string prompt = "cwushell> ";
     string temp = prompt;
     string input = "";
 
-
-
     while (true) {
 
         arr.clear();
         cout << temp;
         getline(cin, input);
-
         inputString(input);
-        printVector();
-        //inputString();
-
 
         if (arr[0] == "prompt") {
             if (arr.size() < 2) {
-                cout << "did not enter the new prompt" << endl;
+                temp = prompt;
                 continue;
             }
             temp = arr[1] + "> ";
-        }
+        }else if(arr[0] == "fileinfo"){
+            if(arr[1] == "-i"){
 
-        if (input == "exit") {
+            }else if(arr[1] == "-t"){
+                determineType(arr[2]);
+            }else if(arr[1] == "-m"){
+
+            }
+        }else if(arr[0] == "exit"){
             exit(0);
-        }
-        else if (input == "-help") {
+        }else if (input == "-help") {
             help();
             continue;
-        }
-        cout << endl;
+        }else if(arr[0] == "osinfo"){
+            if(arr[1] == "-T"){
 
-    }
+            }else if(arr[1] == "-b"){
+                filesystem::space_info si = filesystem::space("/");
+                cout << "Total number of blocks: " << si.capacity << endl;
+            }else if(arr[1] == "-s"){
+                cout << "The max amount of characters that can be used for a filename is: " << FILENAME_MAX << endl;
 
-    /*
-    int start = 0;
-    int end = word.find(input);
-    while (end != -1) {
-        string test = word.substr(start, end - start);
-        if (test == ""){
-            start = end + input.size();
-            end = word.find(input, start);
-            continue;
-        }
-        cout << test  << endl;
-        start = end + input.size();
-        end = word.find(input, start);
-    }
-    cout << word.substr(start, end - start);
-
-
-    while (true) {
-
-        arr.clear();
-        
-        cout << temp;
-        getline(cin, input);
-
-        stringstream ss(input);
-        while (getline(ss, temp, ' ')) {
-            arr.push_back(temp);
-        }
-        
-
-        if (arr[0] == "prompt") {
-            if (arr.size() < 2) {
-                cout << "did not enter the new prompt" << endl;
-                continue;
             }
         }
-
-        if (input == "exit") {
-            exit(0);
-        }
-        else if (input == "-help") {
-            help();
-            continue;
-        }
-        cout << endl;
-
-    }*/
+    }
 }
