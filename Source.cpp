@@ -4,24 +4,14 @@
 #include <filesystem>
 #include <ostream>
 #include <ctime>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 using namespace std;
-
 vector <string> arr;
-void help() {
-    cout << endl;
-    cout << "help" << endl;
-    cout << "help" << endl;
-    cout << "help" << endl;
-    cout << "help" << endl;
-    cout << "help" << endl;
-    cout << endl;
+struct stat stats;
 
-}
-void printVector(){
-    for (int i = 0; i < arr.size(); ++i) {
-        cout << "input"<<i << ": " << arr[i] << endl;
-    }
-}
 void inputString(string str){
     string delim = " ";
     int start = 0;
@@ -39,24 +29,39 @@ void inputString(string str){
     arr.push_back(str.substr(start, end - start));
 }
 void determineType(string str){
-    //current tester
-    filesystem::path path = "test.txt";
-
-    filesystem::file_status status = filesystem::status(path);
+    filesystem::file_status status = filesystem::status(str);
     filesystem::file_type type = status.type();
 
     switch(type){
         case filesystem::file_type::regular:
-            cout << "reg\n";
+            cout << "This files type is regular.\n";
             break;
         case filesystem::file_type::none:
-            cout << "none\n";
+            cout << "There is no file type.\n";
             break;
         case filesystem::file_type::not_found:
-            cout << "not found\n";
+            cout << "The file type was unfortunately not found.\n";
             break;
         case filesystem::file_type::block:
-            cout << "block\n";
+            cout << "The type of the file is block\n";
+            break;
+        case filesystem::file_type::directory:
+            cout << "The file is of type directory.\n";
+            break;
+        case filesystem::file_type::symlink:
+            cout << "The type of this file is symlink.\n";
+            break;
+        case filesystem::file_type::character:
+            cout << "The type of this file is character.\n";
+            break;
+        case filesystem::file_type::fifo:
+            cout << "This files type is fifo.\n";
+            break;
+        case filesystem::file_type::socket:
+            cout << "This file has a socket type.\n";
+            break;
+        case filesystem::file_type::unknown:
+            cout << "The file type of this file is unknown.\n";
             break;
     }
 }
@@ -111,8 +116,8 @@ int main() {
 
     string prompt = "cwushell> ";
     string temp = prompt;
-    string input = "";
-
+    string input;
+    stat("/", &stats);
     while (true) {
 
         arr.clear();
@@ -129,21 +134,25 @@ int main() {
             temp = arr[1] + "> ";
         }else if(arr[0] == "fileinfo"){
             if(arr.size() < 2){
-                cout << "No filename or specifier was given.\n"
-                        "Please try again with more information\n"
-                        "You can use fileinfo -h or fileinfo -help for more help.\n";
+                cout << "The Inode number of the basic file: " << stats.st_ino << endl;
+                determineType("/");
+                cout << "The last modification date of the basic folder fils was: " <<ctime(&stats.st_mtime) << endl;
                 continue;
             }
-
-            if(arr[1] == "-i"){
-                cout << "-i";
-            }else if(arr[1] == "-t"){
+            if (arr[1] == "-i") {
+                cout << "The Inode number of the basic file: " << stats.st_ino << endl;
+            }else if (arr[1] == "-t") {
+                if (arr.size() < 3){
+                    cout << "No file was given to check file type. Please try again with a file name.\n"
+                            "Use fileinfo -h or fileinfo -help for more help\n";
+                    continue;
+                }
                 determineType(arr[2]);
-            }else if(arr[1] == "-m"){
-
-            }else if(arr[1] == "-help" || arr[1] == "-h") { fileInfoHelp(); continue;
-            }else{
-                    //if no switch is specified print all three above
+            } else if (arr[1] == "-m") {
+                cout << "The last modification date of the basic folder file was: " <<ctime(&stats.st_mtime);
+            } else if (arr[1] == "-help" || arr[1] == "-h") {
+                fileInfoHelp();
+                continue;
             }
         }else if(arr[0] == "exit"){
             if(arr[1] == "-h" || arr[1] == "-help"){exitHelp();}
@@ -165,8 +174,8 @@ int main() {
             if(arr[1] == "-T"){
 
             }else if(arr[1] == "-b"){
-                filesystem::space_info si = filesystem::space("/");
-                cout << "Total number of blocks: " << si.capacity << endl;
+                filesystem::space_info fileCap = filesystem::space("/");
+                cout << "Total number of blocks: " << fileCap.capacity /stats.st_blksize << endl;
             }else if(arr[1] == "-s"){
                 cout << "The max amount of characters that can be used for a filename is: " << FILENAME_MAX << endl;
             }else if(arr[1] == "-h" || arr[1] == "-help"){osInfoHelp();continue;}
