@@ -1,14 +1,11 @@
 #include <iostream>
 #include <vector>
-#include <sstream>
 #include <filesystem>
 #include <ostream>
 #include <ctime>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <bits/stdc++.h>
-#include <cstdlib>
 //#include "library.h"
 
 using namespace std;
@@ -91,7 +88,7 @@ void promptHelp(){
             "\tprompt - This is the name of the word that sits in front of every command.\n\n"
             "OPTIONS\n"
             "\t[new prompt name]\tAfter prompt type in what you want the new prompt to be.\n\n"
-            "\tIf no new prompt is provided then the prompt is changed back to the orginal:cwushell.\n\n";
+            "\tIf no new prompt is provided then the prompt is changed back to the orginal: cwushell.\n\n";
 }
 void exitHelp(){
     cout << "EXIT\n\n"
@@ -194,7 +191,7 @@ int main() {
             }else if(arr[1] == "-h" || arr[1] == "-help"){osInfoHelp();continue;}
         }else if(arr[0] == "ls"){
 
-            for (const auto & entry : filesystem::directory_iterator("/")){
+            for (const auto & entry : filesystem::directory_iterator(path)){
                 cout << entry.path() << endl;
             }
         }else if (arr[0] == "cd"){
