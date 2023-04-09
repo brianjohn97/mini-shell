@@ -7,6 +7,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <bits/stdc++.h>
+#include <cstdlib>
+//#include "library.h"
 
 using namespace std;
 vector <string> arr;
@@ -117,7 +120,8 @@ int main() {
     string prompt = "cwushell> ";
     string temp = prompt;
     string input;
-    stat("/", &stats);
+    string path = "/";
+    //stat("/", &stats);
     while (true) {
 
         arr.clear();
@@ -134,13 +138,20 @@ int main() {
             temp = arr[1] + "> ";
         }else if(arr[0] == "fileinfo"){
             if(arr.size() < 2){
+                const char* inodeNum = arr[2].c_str();
+                stat(inodeNum, &stats);
+
                 cout << "The Inode number of the basic file: " << stats.st_ino << endl;
                 determineType("/");
-                cout << "The last modification date of the basic folder fils was: " <<ctime(&stats.st_mtime) << endl;
+                cout << "The last modification date of the basic folder file was: " <<ctime(&stats.st_mtime) << endl;
                 continue;
             }
             if (arr[1] == "-i") {
-                cout << "The Inode number of the basic file: " << stats.st_ino << endl;
+
+                const char* inodeNum = arr[2].c_str();
+                stat(inodeNum, &stats);
+                cout << "The Inode number of the given file: " << stats.st_ino << endl;
+
             }else if (arr[1] == "-t") {
                 if (arr.size() < 3){
                     cout << "No file was given to check file type. Please try again with a file name.\n"
@@ -149,6 +160,8 @@ int main() {
                 }
                 determineType(arr[2]);
             } else if (arr[1] == "-m") {
+                const char* modDate = arr[2].c_str();
+                stat(modDate, &stats);
                 cout << "The last modification date of the basic folder file was: " <<ctime(&stats.st_mtime);
             } else if (arr[1] == "-help" || arr[1] == "-h") {
                 fileInfoHelp();
@@ -175,10 +188,20 @@ int main() {
 
             }else if(arr[1] == "-b"){
                 filesystem::space_info fileCap = filesystem::space("/");
-                cout << "Total number of blocks: " << fileCap.capacity /stats.st_blksize << endl;
+                //cout << "Total number of blocks: " << fileCap.capacity /stats.st_blksize << endl;
             }else if(arr[1] == "-s"){
                 cout << "The max amount of characters that can be used for a filename is: " << FILENAME_MAX << endl;
             }else if(arr[1] == "-h" || arr[1] == "-help"){osInfoHelp();continue;}
+        }else if(arr[0] == "ls"){
+
+            for (const auto & entry : filesystem::directory_iterator("/")){
+                cout << entry.path() << endl;
+            }
+        }else if (arr[0] == "cd"){
+            if(arr.size() < 2){cout << "Did not add filepath to change path to. please try again"; continue;}
+            path = arr[1];
+        }else if (arr[0] == "pwd"){
+            cout << filesystem::current_path() << endl;
         }
     }
 }
