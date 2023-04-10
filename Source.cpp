@@ -127,12 +127,14 @@ void osInfoHelp(){
 }
 int main() {
 
-    while (true) {
-        //sets up the prompt and basic pathway
-        string prompt = "cwushell> ";
-        string temp = prompt;
-        string path = "/";
 
+
+
+    //sets up the prompt and basic pathway
+    string prompt = "cwushell> ";
+    string temp = prompt;
+    string path = "/";
+    while (true) {
         //clear out the vector for every new command
         arr.clear();
         string input;
@@ -147,6 +149,9 @@ int main() {
         if (arr[0] == "prompt") {
             if(arr[1] == "-h" || arr[1] == "-help"){promptHelp();continue;}
 
+            if(arr[1] == ""){cout << "Did not specify new prompt. Please type the new prompt after the comman 'prompt.\n"
+                                     "For more help try prompt -h or prompt -help for more help.\nprompt";continue;}
+
             //changes the prompt to one specified by user
             if (arr.size() < 2) {
                 temp = prompt;
@@ -160,17 +165,21 @@ int main() {
             //if no specifer or filename was provided then print all 3 specifiers:
             //the inode number of file, the file type, and the last modified date.
             if(arr.size() < 2){
-                const char* inodeNum = arr[2].c_str();
-                stat(inodeNum, &stats);
+                stat("/", &stats);
 
                 cout << "The Inode number of the basic file: " << stats.st_ino << endl;
                 determineType("/");
-                cout << "The last modification date of the basic folder file was: " <<ctime(&stats.st_mtime) << endl;
+                cout << "The last modification date of the basic folder file was: " <<ctime(&stats.st_mtime);
                 continue;
             }
 
             //prints the inode number
             if (arr[1] == "-i") {
+                if (arr.size() < 3){
+                    cout << "No file was given to check file type. Please try again with a file name.\n"
+                            "Use fileinfo -h or fileinfo -help for more help\n";
+                    continue;
+                }
 
                 const char* inodeNum = arr[2].c_str();
                 stat(inodeNum, &stats);
@@ -187,6 +196,12 @@ int main() {
 
             //prints the date the file was last modified
             } else if (arr[1] == "-m") {
+                if (arr.size() < 3){
+                    cout << "No file was given to check file type. Please try again with a file name.\n"
+                            "Use fileinfo -h or fileinfo -help for more help\n";
+                    continue;
+                }
+
                 const char* modDate = arr[2].c_str();
                 stat(modDate, &stats);
                 cout << "The last modification date of the basic folder file was: " <<ctime(&stats.st_mtime);
@@ -202,7 +217,7 @@ int main() {
             exit(0);
 
         //manual command that prints out all the help from the other commands
-        }else if (input == "manual") {
+        }else if (arr[0] == "manual" || arr[0] == "manual" && arr.size() > 1) {
             cout << "\t\t\t\tMANUAL\n\n";
             promptHelp();
             fileInfoHelp();
@@ -234,12 +249,6 @@ int main() {
                 cout << "The max amount of characters that can be used for a filename is: " << FILENAME_MAX << endl;
             }else if(arr[1] == "-h" || arr[1] == "-help"){osInfoHelp();continue;}
 
-        //prints out the the current directories files
-        }else if(arr[0] == "ls"){
-
-            for (const auto & entry : filesystem::directory_iterator(path)){
-                cout << entry.path() << endl;
-            }
 
         //changes the current pathway to one specified by the user
         }else if (arr[0] == "cd"){
@@ -248,7 +257,9 @@ int main() {
 
         //prints the current directories pathway
         }else if (arr[0] == "pwd"){
-            cout << filesystem::current_path() << endl;
-        }
+            system("pwd");
+
+        //lets the user type in any linux commands
+        }else {system(input.c_str());}
     }
 }
