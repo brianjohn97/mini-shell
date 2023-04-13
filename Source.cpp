@@ -1,12 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <filesystem>
-#include <ostream>
-#include <ctime>
 #include <sys/stat.h>
-#include <unistd.h>
-#include <bits/stdc++.h>
-//#include "library.h"
 
 using namespace std;
 vector <string> arr;
@@ -127,9 +122,6 @@ void osInfoHelp(){
 }
 int main() {
 
-
-
-
     //sets up the prompt and basic pathway
     string prompt = "cwushell> ";
     string temp = prompt;
@@ -147,16 +139,18 @@ int main() {
 
         //the prompt command
         if (arr[0] == "prompt") {
-            if(arr[1] == "-h" || arr[1] == "-help"){promptHelp();continue;}
-
-            if(arr[1] == ""){cout << "Did not specify new prompt. Please type the new prompt after the comman 'prompt.\n"
-                                     "For more help try prompt -h or prompt -help for more help.\nprompt";continue;}
-
             //changes the prompt to one specified by user
             if (arr.size() < 2) {
                 temp = prompt;
                 continue;
             }
+            if(arr[1] == ""){
+                cout << "Did not specify new prompt. Please type the new prompt after the command 'prompt.\n"
+                        "For more help try prompt -h or prompt -help for more help.\n";
+                continue;
+            }
+
+            if(arr[1] == "-h" || arr[1] == "-help"){promptHelp();continue;}
             temp = arr[1] + "> ";
 
         //the fileinfo command
@@ -241,6 +235,7 @@ int main() {
 
             //prints out the total amount of blocks in the file system
             }else if(arr[1] == "-b"){
+                stat("/", &stats);
                 filesystem::space_info fileCap = filesystem::space("/");
                 //cout << "Total number of blocks: " << fileCap.capacity /stats.st_blksize << endl;
 
