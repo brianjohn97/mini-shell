@@ -232,18 +232,17 @@ int main() {
 
             //prints out the file system of the computer
             if(arr[1] == "-T"){
-
+                cout << "File system could not be found.\n";
             //prints out the total amount of blocks in the file system
             }else if(arr[1] == "-b"){
                 stat("/", &stats);
                 filesystem::space_info fileCap = filesystem::space("/");
-                //cout << "Total number of blocks: " << fileCap.capacity /stats.st_blksize << endl;
+                cout << "Total number of blocks: " << fileCap.capacity /stats.st_blksize << endl;
 
             //prints out the max amount of charaters that can be used to create a filename
             }else if(arr[1] == "-s"){
                 cout << "The max amount of characters that can be used for a filename is: " << FILENAME_MAX << endl;
             }else if(arr[1] == "-h" || arr[1] == "-help"){osInfoHelp();continue;}
-
 
         //changes the current pathway to one specified by the user
         }else if (arr[0] == "cd"){
